@@ -1,9 +1,22 @@
 var issueContainerEl = document.querySelector("#issues-container");
 var limitWarningEl = document.querySelector("#limit-warning");
+var repoNameEl = document.querySelector("#repo-name");
+
+var getRepoName = function () {
+  // assign the query string to a variable
+  var queryString = document.location.search;
+  var repoName = queryString.split("=")[1];
+
+  if (repoName) {
+    getRepoIssues(repoName);
+    repoNameEl.textContent = repoName;
+  } else {
+    document.location.replace("./index.html");
+  }
+};
 
 var getRepoIssues = function (repo) {
-  var apiUrl =
-    "https://api.github.com/repos/yulduzetta/" + repo + "/issues?direction=asc";
+  var apiUrl = "https://api.github.com/repos/" + repo + "/issues?direction=asc";
 
   fetch(apiUrl).then(function (response) {
     // request was successful
@@ -14,11 +27,11 @@ var getRepoIssues = function (repo) {
 
         // check if api has paginated issues
         if (response.headers.get("Link")) {
-            displayWarning();
+          displayWarning();
         }
       });
     } else {
-      alert("There was a problem with your request!");
+      document.location.replace("./index.html");
     }
   });
 };
@@ -58,14 +71,14 @@ var displayIssues = function (issues) {
   }
 };
 
-var displayWarning = function(repo){
-    var linkEl = document.createElement("a");
-    linkEl.textContent = "See More Issues on GitHub.com";
-    linkEl.setAttribute("href", "https://github.com/" + repo + "/issues");
-    linkEl.setAttribute("target", "_blank");
-  
-    // append to warning container
-    limitWarningEl.appendChild(linkEl);
-}
+var displayWarning = function (repo) {
+  var linkEl = document.createElement("a");
+  linkEl.textContent = "See More Issues on GitHub.com";
+  linkEl.setAttribute("href", "https://github.com/" + repo + "/issues");
+  linkEl.setAttribute("target", "_blank");
 
-getRepoIssues("git-it-done");
+  // append to warning container
+  limitWarningEl.appendChild(linkEl);
+};
+
+getRepoName();
